@@ -1,0 +1,3 @@
+[submodule "libs/openbuilds"]
+	path = libs/openbuilds
+	url = https://github.com/mazerte/openscad-openbuilds
