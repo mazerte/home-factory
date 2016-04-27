@@ -1,21 +1,20 @@
 include <../libs/openbuilds/utils/colors.scad>;
 
-use <../libs/openbuilds/brackets/angle_corner.scad>;
-use <../libs/openbuilds/brackets/cube_corner.scad>;
 use <../libs/openbuilds/linear_rails/vslot.scad>;
 use <../libs/openbuilds/plates/joining_plate.scad>;
+use <../libs/openbuilds/plates/vslot_gantry_plate.scad>;
 use <../libs/openbuilds/hardware/acme_lead_screw_nut.scad>;
 use <../libs/openbuilds/screws/screw.scad>;
+use <../libs/openbuilds/wheels/vwheel.scad>;
 
 use <../helpers/angle_corner_with_screw.scad>;
 use <../helpers/cube_corner_with_screw.scad>;
 use <../helpers/screw_with_tnut.scad>;
+use <../helpers/vwheel_with_screw.scad>;
 
 max_size=500;
 
-module z_axe_plate(width, height, margin=20) {
-  w=width+margin*2;
-  h=height+margin*2;
+module z_axe_plate(w, h) {
   for (y=[1,-1]) translate([-(w/2)+20, (h/2-10)*y]) rotate([0, 90, 0]) vslot(w-20*2);
   for (x=[1,-1]) translate([(w/2-10)*x, -(h/2)+20]) rotate([0, 90, 90]) vslot(h-20*2);
   for (x=[1,-1], y=[1,-1])
@@ -78,8 +77,22 @@ module z_axe_plate(width, height, margin=20) {
   }
   translate([-w/2-10, 0, -10]) lead_screw_fixing_block();
   translate([w/2+10, 0, -10]) rotate([0, 0, 180]) lead_screw_fixing_block();
+
+  // carriage
+  module carriage() {
+    rotate([0, 90, 0]) 20mm_v_plate();
+    for (x=[20,-20], y=[20,-20]) translate([3.4, x, y]) rotate([0, 90, 0]) vwheel_with_screw(eccentric=(x>0)) xtreme_solid_vwheel();
+    for (x=[10,-10]) translate([3.4, x, 0]) rotate([180, 90, 0]) screw_with_tnut();
+  }
+  translate([-w/2-1.7, -h/2+60, 0]) carriage();
+  translate([-w/2-1.7, h/2-60, 0])  carriage();
+  translate([w/2+1.7, h/2-60, 0])  rotate([0, 0, 180]) carriage();
+  translate([w/2+1.7, -h/2+60, 0]) rotate([0, 0, 180]) carriage();
 }
 
-module z_axe(w, h, position=0) {
-  z_axe_plate(w, h);
+module z_axe(width, height, length, position=0, margin=20) {
+  w=width+margin*2;
+  h=height+margin*2;
+  for (x=[-w/2-13.5, w/2+13.5], y=[-h/2+60, h/2-60]) translate([x, y, -150]) vslot20x20(length+150+150);
+  translate([0, 0, length - position]) z_axe_plate(w, h);
 }
