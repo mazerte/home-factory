@@ -23,7 +23,7 @@ use <../helpers/vwheel_with_screw.scad>;
 
 max_size=500;
 
-module z_axe_plate(w, h) {
+module z_axe_plate_strucutre(w, h) {
   for (y=[1,-1]) translate([-(w/2)+20, (h/2-10)*y]) rotate([0, 90, 0]) vslot(w-20*2);
   for (x=[1,-1]) translate([(w/2-10)*x, -(h/2)+20]) rotate([0, 90, 90]) vslot(h-20*2);
   for (x=[1,-1], y=[1,-1])
@@ -57,6 +57,15 @@ module z_axe_plate(w, h) {
         translate([px+10, py+plength, -10]) rotate([0, 90, -90]) angle_corner_with_screw();
     }
   }
+}
+
+module z_axe_plate(w, h) {
+  nb_x = floor(w/(max_size+1))+1; // add some renfort when it's max than max_size
+  nb_y = floor(h/(max_size+1))+1; // add some renfort when it's max than max_size
+  dx = (w-20)/nb_x;
+  dy = (h-20)/nb_y;
+
+  z_axe_plate_strucutre(w, h);
 
   // Fixations
   for (x=[1:nb_x]) {
@@ -144,5 +153,8 @@ module z_axe(width, height, length, position=0, margin=20) {
   for (x=[-w/2-13.5, w/2+13.5], y=[-h/2+60, h/2-60]) translate([x, y, -150]) vslot20x20(length+150+150);
   for (x=[-w/2-10, w/2+10]) translate([x, 0, -50]) rotate([0, 0, x > 0 ? 0 : 180]) z_mouvement_axe(h, length);
 
-  translate([0, 0, length - position]) z_axe_plate(w, h);
+  translate([0, 0, length - position]) {
+    z_axe_plate(w, h);
+    translate([0, 0, 20]) children();
+  }
 }
