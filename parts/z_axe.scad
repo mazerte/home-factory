@@ -1,8 +1,10 @@
+include <../libs/openbuilds/utils/colors.scad>;
+
 use <../libs/openbuilds/brackets/angle_corner.scad>;
 use <../libs/openbuilds/brackets/cube_corner.scad>;
 use <../libs/openbuilds/linear_rails/vslot.scad>;
 use <../libs/openbuilds/plates/joining_plate.scad>;
-use <../libs/openbuilds/plates/joining_plate.scad>;
+use <../libs/openbuilds/hardware/acme_lead_screw_nut.scad>;
 use <../libs/openbuilds/screws/screw.scad>;
 
 use <../helpers/angle_corner_with_screw.scad>;
@@ -38,7 +40,7 @@ module z_axe_plate(width, height, margin=20) {
         translate([px-10, py, 10]) rotate([0, -90, 0]) angle_corner_with_screw();
     }
     if (x > 0 && x < nb_x) {
-      translate([px, py, 0]) rotate([0, 90, 90]) vslot(plength);
+      translate([px, py, 0]) rotate([0, 90, 90]) vslot20x20(plength);
     }
     if (x < nb_x) {
       if (y > 0 || x > 0)
@@ -61,6 +63,21 @@ module z_axe_plate(width, height, margin=20) {
       translate([90, 30, -1]) rotate([0, 0, 90]) screw_with_tnut();
     }
   }
+
+  // Lead screw nuts
+  module lead_screw_fixing_block() {
+    union() {
+      translate([0, 0, -3.20]) rotate([0, 0, 90])   acme_lead_screw_nut_block();
+      translate([10, -20, 20]) rotate([90, -90, 0]) angle_corner_with_screw();
+      translate([10, -20, 40]) rotate([90, -90, 0]) angle_corner_with_screw();
+      rotate([0, 0, 90]) vslot20x40(40, color_black);
+      translate([10, 20, 40]) rotate([0, -90, 0]) angle_corner_with_screw();
+      translate([10, 20, 20]) rotate([0, -90, 0]) angle_corner_with_screw();
+      translate([0, 0, 43.20]) rotate([180, 0, 90]) acme_lead_screw_nut_block();
+    }
+  }
+  translate([-w/2-10, 0, -10]) lead_screw_fixing_block();
+  translate([w/2+10, 0, -10]) rotate([0, 0, 180]) lead_screw_fixing_block();
 }
 
 module z_axe(w, h, position=0) {
