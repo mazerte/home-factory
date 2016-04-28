@@ -1,12 +1,12 @@
 include <../../libs/openbuilds/utils/colors.scad>;
 
-use <../z_axe.scad>;
+use <./base.scad>;
 
 module heated_bed(width, height, margin=20) {
   w = width+margin*2;
   h = height+margin*2;
 
-  z_axe_plate_strucutre(w, h);
+  build_plate_base(w, h);
   translate([0, 0, 10+1.5]) color(color_aluminum) cube([w, h, 3], center=true);
 
   // CoroPad

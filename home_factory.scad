@@ -12,6 +12,10 @@ module home_factory(w, h, length, x=0, y=0, z=0) {
     echo("The minimum size of the home factory is 250x250x250 !");
     w = max(w, 250); h = max(h, 250); length = max(length, 250);
   }
+  if (w > 1000 || h > 1000 || length > 1000) {
+    echo("The maximum size of the home factory is 1000x1000x1000 !");
+    w = min(w, 1000); h = min(h, 1000); length = min(length, 1000);
+  }
 
   margin=100;
   body(w+margin*2, h+margin*2, length+margin*2);
