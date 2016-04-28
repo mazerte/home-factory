@@ -44,7 +44,7 @@ module build_plate_base(w, h, renfort=true, max_size=500) {
   }
 
   for (x=[1:nb_x]) {
-    translate([-(w/2)+dx*x-dx/2, h/2+4, -30])  rotate([90, 0, 0]) union() {
+    translate([-(w/2)+dx*x-dx/2, h/2, -30])  rotate([90, 0, 0]) union() {
       translate([10, 30, 0]) rotate([180, 0, 90]) screw_with_tnut();
     }
     translate([-(w/2)+dx*x-dx/2, -h/2, -30]) rotate([90, 0, 0]) union() {
