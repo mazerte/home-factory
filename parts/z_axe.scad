@@ -20,6 +20,7 @@ use <../helpers/angle_corner_with_screw.scad>;
 use <../helpers/cube_corner_with_screw.scad>;
 use <../helpers/screw_with_tnut.scad>;
 use <../helpers/vwheel_with_screw.scad>;
+use <../helpers/joining_plate_with_screw.scad>;
 
 use <./build_plate/base.scad>;
 
@@ -68,23 +69,37 @@ module z_axe_plate(w, h) {
     for (x=[20,-20], y=[20,-20]) translate([3.4, x, y]) rotate([0, 90, 0]) vwheel_with_screw(eccentric=(x>0)) xtreme_solid_vwheel();
     for (x=[10,-10]) translate([3.4, x, 0]) rotate([180, 90, 0]) screw_with_tnut();
   }
-  translate([-w/2-1.7, -h/2+60, 0]) carriage();
-  translate([-w/2-1.7, h/2-60, 0])  carriage();
-  translate([w/2+1.7, h/2-60, 0])  rotate([0, 0, 180]) carriage();
-  translate([w/2+1.7, -h/2+60, 0]) rotate([0, 0, 180]) carriage();
+  cy = ceil( (h/2-60) / 250 );
+  cd = (h/2-60)/cy;
+  for (x=[-1,1], y=[cd*cy:-cd:cd*-cy]) if (y!=0) translate([(w/2+1.7)*x, y, 0]) rotate([0, 0, x>0?180:0]) carriage();
 }
 
 module z_mouvement_axe_fixation(h) {
   translate([20, 0, 0]) union() {
-    translate([-10, -h/2, 10]) rotate([0, 0, -90]) angle_corner_with_screw();
-    translate([-10, -h/2+20, -10]) rotate([0, 180, -90]) angle_corner_with_screw();
+    /*translate([-10, -h/2, 10]) rotate([0, 0, -90]) angle_corner_with_screw();
+    translate([-10, -h/2+20, -10]) rotate([0, 180, -90]) angle_corner_with_screw();*/
     translate([0, -h/2-3, 0]) rotate([-90, 0, 0]) m5_screw(15);
     translate([0, -h/2-1.5, 0]) rotate([90, 0, 0]) end_cap();
     translate([0, h/2, 0]) rotate([90, 0, 0]) vslot20x20(h);
     translate([0, h/2+1.5, 0]) rotate([-90, 0, 0]) end_cap();
     translate([0, h/2+3, 0]) rotate([90, 0, 0]) m5_screw(15);
-    translate([-10, h/2-20, 10]) rotate([0, 0, -90]) angle_corner_with_screw();
-    translate([-10, h/2, -10]) rotate([0, 180, -90]) angle_corner_with_screw();
+    /*translate([-10, h/2-20, 10]) rotate([0, 0, -90]) angle_corner_with_screw();
+    translate([-10, h/2, -10]) rotate([0, 180, -90]) angle_corner_with_screw();*/
+  }
+}
+
+module z_mouvement_axe_vertical_fixation(length) {
+  vslot20x20(length);
+  for (z=[130,(length-40)]) {
+    translate([-10, 10, z]) rotate([0, 0, 90]) angle_corner_with_screw();
+    translate([-10, -10, z-20]) rotate([0, 180, 90]) angle_corner_with_screw();
+  }
+  for (0, z=[0,1]) {
+    translate([0, 0, (length)*z]) rotate([z>0?0:180, 0, 180]) union() {
+      translate([-10, -10, 0]) 2_joining_plate_with_screw();
+      translate([10, 10, 0]) rotate([0, -90, 0]) angle_corner_with_screw();
+      translate([10, -10, 0]) rotate([90, -90, 0]) angle_corner_with_screw();
+    }
   }
 }
 
@@ -116,11 +131,15 @@ module z_mouvement_axe(h, length) {
 module z_axe(width, height, length, position=0, margin=20) {
   w=width+margin*2;
   h=height+margin*2;
-  for (x=[-w/2-13.5, w/2+13.5], y=[-h/2+60, h/2-60]) translate([x, y, -150]) vslot20x20(length+150+150);
-  for (x=[-w/2-10, w/2+10]) translate([x, 0, -50]) rotate([0, 0, x > 0 ? 0 : 180]) z_mouvement_axe(h, length);
+
+  cy = ceil( (h/2-60) / 250 );
+  cd = (h/2-60)/cy;
+
+  for (x=[-w/2-13.5, w/2+13.5], y=[cd*cy:-cd:cd*-cy]) if(y!=0) translate([x, y, -150]) rotate([0, 0, x>0?180:0]) z_mouvement_axe_vertical_fixation(length+150+150);
+  for (x=[-w/2-10, w/2+10]) translate([x, 0, -30]) rotate([0, 0, x > 0 ? 0 : 180]) z_mouvement_axe(h, length);
 
   translate([0, 0, length - position]) {
-    z_axe_plate(w, h);
-    translate([0, 0, 20]) children();
+    translate([0, 0, 20]) z_axe_plate(w, h);
+    translate([0, 0, 40]) children();
   }
 }
