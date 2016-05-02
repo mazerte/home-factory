@@ -65,7 +65,16 @@ module body_side(h, length) {
 }
 
 module body_back(w, length) {
+  nb=ceil(length/350);
+  offset=length/nb;
 
+  for (z=[offset:offset:(nb-1)*offset]) {
+    translate([-w/2+10, -20, z-length/2]) {
+      translate([10, 10, 0]) rotate([90, 0, 90]) vslot20x20(w-40);
+      translate([w-70, 20, -30]) rotate([0, -90, -90]) t_joining_plate_with_screw();
+      translate([50, 20, 30]) rotate([180, 90, -90]) t_joining_plate_with_screw();
+    }
+  }
 }
 
 module body_front(w, length) {
@@ -81,8 +90,8 @@ module body(width, height, length) {
 
   translate([0, 0, l]) body_top(w, h);
   translate([-w/2, 0, l/2]) rotate([0, 0, 90]) body_side(h, l);
-  translate([0, 0, h/2]) body_back(w, l);
-  translate([0, 0, -h/2]) body_front(w, l);
+  translate([0, h/2, l/2]) body_back(w, l);
+  translate([0, -h/2, l/2]) body_front(w, l);
   translate([w/2, 0, l/2]) rotate([0, 0, -90]) body_side(h, l);
   body_bottom(w, h);
 }
