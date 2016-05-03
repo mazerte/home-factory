@@ -20,7 +20,7 @@ module home_factory(w, h, length, x=0, y=0, z=0) {
   }
 
   body(w, h, length);
-  translate([0, 0, 140]) z_axe(w, h, length, position=z) waste_board(w, h); //heated_bed(w, h);
+  translate([0, 0, 140]) z_axe(w, h, length, position=z) heated_bed(w, h); // waste_board(w, h); //
   translate([0, 0, length+140+150]) y_axe(w, h, position=y);
-  translate([0, 0, 0]) x_axe(w, position=x) cyclops_hotends(1.75);
+  translate([0, h/2-y, length+140+150]) x_axe(w, position=x) cyclops_hotends(1.75);
 }
